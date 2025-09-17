@@ -22,12 +22,19 @@ interface TranscriptionResult {
   timestamp: number;
 }
 
+interface AIResponse {
+  text: string;
+  timestamp: number;
+  confidence?: number;
+}
+
 interface AudioRecorderProps {
   onTranscription?: (result: TranscriptionResult) => void;
+  onAIResponse?: (response: AIResponse) => void;
   onConnectionChange?: (isConnected: boolean) => void;
 }
 
-export default function AudioRecorder({ onTranscription, onConnectionChange }: AudioRecorderProps) {
+export default function AudioRecorder({ onTranscription, onAIResponse, onConnectionChange }: AudioRecorderProps) {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [permissionStatus, setPermissionStatus] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [recordingTime, setRecordingTime] = useState(0);
@@ -55,6 +62,9 @@ export default function AudioRecorder({ onTranscription, onConnectionChange }: A
   } = useWebSocket({
     onTranscription: (result: TranscriptionResult) => {
       onTranscription?.(result);
+    },
+    onAIResponse: (response: AIResponse) => {
+      onAIResponse?.(response);
     },
     onError: (error: string) => {
       console.error('WebSocket error:', error);

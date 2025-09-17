@@ -28,8 +28,22 @@ interface TranscriptionResult {
   timestamp: number;
 }
 
+interface AIResponse {
+  text: string;
+  timestamp: number;
+  confidence?: number;
+}
+
+interface AISegment {
+  id: string;
+  text: string;
+  timestamp: number;
+  confidence?: number;
+}
+
 const App = () => {
   const [transcriptionSegments, setTranscriptionSegments] = useState<TranscriptionSegment[]>([]);
+  const [aiResponses, setAiResponses] = useState<AISegment[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
 
   const handleNewTranscription = (result: TranscriptionResult) => {
@@ -59,8 +73,20 @@ const App = () => {
     });
   };
 
+  const handleNewAIResponse = (response: AIResponse) => {
+    const newSegment: AISegment = {
+      id: `ai-${response.timestamp}-${Math.random()}`,
+      text: response.text,
+      timestamp: response.timestamp,
+      confidence: response.confidence
+    };
+
+    setAiResponses(prev => [...prev, newSegment]);
+  };
+
   const clearTranscriptions = () => {
     setTranscriptionSegments([]);
+    setAiResponses([]);
   };
 
   return (
@@ -75,7 +101,7 @@ const App = () => {
                   Workshop Agente Conversacional
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  Transcrição de áudio em tempo real com Deepgram
+                  Conversa inteligente com IA - Transcrição em tempo real com Deepgram + Claude
                 </p>
               </div>
             </div>
@@ -88,6 +114,7 @@ const App = () => {
               <section className="flex flex-col h-full">
                 <AudioRecorder
                   onTranscription={handleNewTranscription}
+                  onAIResponse={handleNewAIResponse}
                   onConnectionChange={setConnectionStatus}
                 />
               </section>
@@ -96,6 +123,7 @@ const App = () => {
               <section className="flex flex-col h-full">
                 <TranscriptionDisplay
                   segments={transcriptionSegments}
+                  aiResponses={aiResponses}
                   isConnected={connectionStatus}
                   onClear={clearTranscriptions}
                 />
@@ -117,7 +145,7 @@ const App = () => {
                   </a>
                 </p>
                 <p className="mt-1 text-xs">
-                  Powered by React • Node.js • Deepgram • Socket.io
+                  Powered by React • Node.js • Deepgram • AWS Bedrock • Socket.io
                 </p>
               </div>
             </div>

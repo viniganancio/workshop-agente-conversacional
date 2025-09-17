@@ -14,9 +14,16 @@ interface TranscriptionResult {
   timestamp: number;
 }
 
+interface AIResponse {
+  text: string;
+  timestamp: number;
+  confidence?: number;
+}
+
 interface UseWebSocketProps {
   url?: string;
   onTranscription?: (result: TranscriptionResult) => void;
+  onAIResponse?: (response: AIResponse) => void;
   onError?: (error: string) => void;
   autoConnect?: boolean;
   maxRetries?: number;
@@ -38,6 +45,7 @@ interface UseWebSocketReturn {
 export const useWebSocket = ({
   url = 'http://localhost:3001',
   onTranscription,
+  onAIResponse,
   onError,
   autoConnect = true,
   maxRetries = 5
@@ -171,7 +179,17 @@ export const useWebSocket = ({
       onError?.(error);
     });
 
-  }, [url, onTranscription, onError]);
+    socketRef.current.on('ai-response', (response: AIResponse) => {
+      console.log('Received AI response:', response);
+      onAIResponse?.(response);
+    });
+
+    socketRef.current.on('ai-error', (error: string) => {
+      console.error('AI response error:', error);
+      onError?.(error);
+    });
+
+  }, [url, onTranscription, onAIResponse, onError]);
 
   const disconnect = useCallback(() => {
     console.log('🛑 Disconnecting...');
