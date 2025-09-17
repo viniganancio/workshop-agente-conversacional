@@ -20,7 +20,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx_copybutton',
-    'sphinxext.mermaid',
+    'sphinxcontrib.mermaid',
 ]
 
 # MyST parser configuration
