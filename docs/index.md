@@ -20,15 +20,16 @@ Este workshop apresenta uma implementação completa de um agente conversacional
 
 ## 📋 Estrutura do Workshop
 
-O workshop está organizado em 3 etapas progressivas:
-
 ```{toctree}
 :maxdepth: 2
-:caption: Etapas do Workshop
+:caption: Workshop Completo
 
+introduction/index
+getting-started/index
 etapa-01/index
 etapa-02/index
 etapa-03/index
+challenge/index
 ```
 
 ## 🛠️ Guias Técnicos
@@ -37,20 +38,20 @@ etapa-03/index
 :maxdepth: 2
 :caption: Documentação Técnica
 
-setup/prerequisites
-setup/installation
-setup/configuration
 guides/troubleshooting
+guides/deployment
+guides/best-practices
 ```
 
-## 📖 Referência da API
+## 🔧 Configuração Avançada
 
 ```{toctree}
 :maxdepth: 2
-:caption: API Reference
+:caption: Setup e APIs
 
-api/frontend
-api/backend
+api/deepgram-setup
+api/aws-bedrock-setup
+api/elevenlabs-setup
 api/websocket-events
 ```
 

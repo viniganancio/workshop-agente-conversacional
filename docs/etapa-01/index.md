@@ -16,10 +16,25 @@ Primeira etapa do workshop focada em **transcrição básica de áudio em tempo 
 
 ## 🏗️ Arquitetura
 
-```
-🎤 Microfone → Web Audio API → WebSocket → Backend Node.js → Deepgram STT
-                                    ↑                              ↓
-                       Interface React ← WebSocket ←──────────────┘
+```{mermaid}
+graph TB
+    subgraph "🖥️ Frontend (React + TypeScript)"
+        A[🎤 AudioRecorder] --> B[📡 WebSocket Client]
+        B --> C[💬 Transcription Display]
+    end
+
+    subgraph "🌐 Backend (Node.js + TypeScript)"
+        D[📡 WebSocket Server] --> E[🎵 Audio Processing]
+        E --> F[📝 Deepgram STT]
+    end
+
+    B <--> D
+    F --> E
+    E --> D
+
+    style A fill:#e1f5fe
+    style C fill:#f3e5f5
+    style F fill:#fff3e0
 ```
 
 ## 🚀 Como Executar

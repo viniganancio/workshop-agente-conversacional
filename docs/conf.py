@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx_copybutton',
+    'sphinxext.mermaid',
 ]
 
 # MyST parser configuration
@@ -30,6 +31,7 @@ myst_enable_extensions = [
     "replacements",
     "smartquotes",
     "tasklist",
+    "colon_fence",
 ]
 
 templates_path = ['_templates']

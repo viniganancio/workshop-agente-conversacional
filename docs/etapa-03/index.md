@@ -18,14 +18,32 @@
 
 ## 🏗️ Arquitetura Completa
 
-```
-🎤 Microfone → Web Audio API → WebSocket → Backend → Deepgram STT
-                                    ↑          ↓
-                                    |    AWS Bedrock Claude
-                                    |          ↓
-                                    |    ElevenLabs TTS
-                                    ↓          ↑
-                            Audio Player ← WebSocket
+```{mermaid}
+graph TB
+    subgraph "🖥️ Frontend (React + TypeScript)"
+        A[🎤 AudioRecorder] --> B[📡 WebSocket Client]
+        B --> C[💬 Chat Interface]
+        C --> D[🔊 Audio Player]
+    end
+
+    subgraph "🌐 Backend (Node.js + TypeScript)"
+        E[📡 WebSocket Server] --> F[🎵 Audio Processing]
+        F --> G[📝 Deepgram STT]
+        F --> H[🤖 AWS Bedrock Claude]
+        F --> I[🔊 ElevenLabs TTS]
+    end
+
+    B <--> E
+    G --> F
+    H --> F
+    I --> F
+    F --> E
+
+    style A fill:#e1f5fe
+    style C fill:#f3e5f5
+    style G fill:#fff3e0
+    style H fill:#fce4ec
+    style I fill:#e8f5e8
 ```
 
 ## 🚀 Como Executar

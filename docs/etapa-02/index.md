@@ -16,12 +16,28 @@ Segunda etapa que adiciona **inteligência conversacional** às transcrições u
 
 ## 🏗️ Arquitetura
 
-```
-🎤 Microfone → Web Audio API → WebSocket → Backend → Deepgram STT
-                                    ↑          ↓
-                                    |    AWS Bedrock Claude
-                                    ↓          ↑
-                          Chat Interface ← WebSocket
+```{mermaid}
+graph TB
+    subgraph "🖥️ Frontend (React + TypeScript)"
+        A[🎤 AudioRecorder] --> B[📡 WebSocket Client]
+        B --> C[💬 Chat Interface]
+    end
+
+    subgraph "🌐 Backend (Node.js + TypeScript)"
+        D[📡 WebSocket Server] --> E[🎵 Audio Processing]
+        E --> F[📝 Deepgram STT]
+        E --> G[🤖 AWS Bedrock Claude]
+    end
+
+    B <--> D
+    F --> E
+    G --> E
+    E --> D
+
+    style A fill:#e1f5fe
+    style C fill:#f3e5f5
+    style F fill:#fff3e0
+    style G fill:#fce4ec
 ```
 
 ## 🚀 Como Executar
