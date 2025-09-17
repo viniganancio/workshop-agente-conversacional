@@ -30,11 +30,7 @@ interface TranscriptionResult {
 
 const App = () => {
   const [transcriptionSegments, setTranscriptionSegments] = useState<TranscriptionSegment[]>([]);
-
-  // Global WebSocket connection status
-  const { isConnected } = useWebSocket({
-    autoConnect: false // We'll let the AudioRecorder handle its own connection
-  });
+  const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
 
   const handleNewTranscription = (result: TranscriptionResult) => {
     const newSegment: TranscriptionSegment = {
@@ -92,7 +88,7 @@ const App = () => {
               <section className="flex flex-col h-full">
                 <AudioRecorder
                   onTranscription={handleNewTranscription}
-                  globalConnectionStatus={isConnected}
+                  onConnectionChange={setConnectionStatus}
                 />
               </section>
 
@@ -100,7 +96,7 @@ const App = () => {
               <section className="flex flex-col h-full">
                 <TranscriptionDisplay
                   segments={transcriptionSegments}
-                  isConnected={isConnected}
+                  isConnected={connectionStatus}
                   onClear={clearTranscriptions}
                 />
               </section>

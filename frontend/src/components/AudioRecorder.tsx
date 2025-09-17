@@ -24,10 +24,10 @@ interface TranscriptionResult {
 
 interface AudioRecorderProps {
   onTranscription?: (result: TranscriptionResult) => void;
-  globalConnectionStatus?: boolean;
+  onConnectionChange?: (isConnected: boolean) => void;
 }
 
-export default function AudioRecorder({ onTranscription, globalConnectionStatus }: AudioRecorderProps) {
+export default function AudioRecorder({ onTranscription, onConnectionChange }: AudioRecorderProps) {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [permissionStatus, setPermissionStatus] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [recordingTime, setRecordingTime] = useState(0);
@@ -77,6 +77,11 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
       }
     };
   }, []);
+
+  // Notify parent component about connection status changes
+  useEffect(() => {
+    onConnectionChange?.(isConnected);
+  }, [isConnected, onConnectionChange]);
 
   const checkMicrophonePermission = async () => {
     try {
@@ -313,30 +318,68 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
       <CardContent className="flex-1 flex flex-col justify-center space-y-6">
         {/* Audio Level Visualizer */}
         <div className="flex items-center justify-center">
-          <div className="relative w-24 h-24">
+          <div className="relative w-32 h-32">
+            {/* Outer pulse rings for recording */}
+            {recordingState === 'recording' && (
+              <>
+                <div className="absolute inset-0 rounded-full border-2 border-red-500/30 animate-ping" />
+                <div className="absolute inset-2 rounded-full border-2 border-red-500/20 animate-ping animation-delay-75" />
+                <div className="absolute inset-4 rounded-full border-2 border-red-500/10 animate-ping animation-delay-150" />
+              </>
+            )}
+
+            {/* Main microphone container */}
             <div
               className={cn(
-                "absolute inset-0 rounded-full border-3 transition-all duration-100",
+                "absolute inset-6 rounded-full transition-all duration-300 ease-out shadow-lg",
+                "bg-gradient-to-br from-white via-slate-50 to-slate-100",
+                "border-2 hover:shadow-xl transform-gpu",
                 recordingState === 'recording'
-                  ? "border-red-500 animate-pulse"
-                  : "border-gray-300"
+                  ? "border-red-500 shadow-red-500/25 scale-110"
+                  : recordingState === 'processing'
+                  ? "border-yellow-500 shadow-yellow-500/25 scale-105"
+                  : "border-slate-300 hover:border-primary hover:scale-105 active:scale-95"
               )}
               style={{
-                transform: `scale(${1 + audioLevel * 0.3})`,
+                transform: recordingState === 'recording'
+                  ? `scale(${1.1 + audioLevel * 0.15})`
+                  : undefined,
                 boxShadow: recordingState === 'recording'
-                  ? `0 0 ${15 + audioLevel * 20}px rgba(239, 68, 68, 0.4)`
-                  : 'none'
+                  ? `0 0 ${20 + audioLevel * 30}px rgba(239, 68, 68, 0.3), 0 8px 32px rgba(0, 0, 0, 0.12)`
+                  : recordingState === 'processing'
+                  ? '0 0 20px rgba(234, 179, 8, 0.3), 0 8px 32px rgba(0, 0, 0, 0.12)'
+                  : undefined
               }}
-            />
-            <div className="absolute inset-3 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
-              {recordingState === 'processing' ? (
-                <Loader2 className="w-6 h-6 text-primary animate-spin" />
-              ) : recordingState === 'recording' ? (
-                <MicOff className="w-6 h-6 text-red-500" />
-              ) : (
-                <Mic className="w-6 h-6 text-primary" />
-              )}
+            >
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
+                {recordingState === 'processing' ? (
+                  <Loader2 className="w-8 h-8 text-yellow-600 animate-spin" />
+                ) : recordingState === 'recording' ? (
+                  <MicOff className="w-8 h-8 text-red-500 transition-all duration-200" />
+                ) : (
+                  <Mic className="w-8 h-8 text-primary transition-all duration-200 hover:scale-110" />
+                )}
+              </div>
             </div>
+
+            {/* Audio level indicator bars */}
+            {recordingState === 'recording' && (
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 bg-red-500 rounded-full opacity-60"
+                    style={{
+                      height: `${8 + audioLevel * 16}px`,
+                      left: '50%',
+                      top: '50%',
+                      transform: `translate(-50%, -50%) rotate(${i * 45}deg) translateY(-${20 + audioLevel * 8}px)`,
+                      animationDelay: `${i * 50}ms`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -356,10 +399,10 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
             <Button
               onClick={startRecording}
               size="lg"
-              className="min-w-32"
+              className="min-w-32 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-primary/25"
               disabled={recordingState === 'processing' || !canRetry}
             >
-              <Mic className="w-4 h-4 mr-2" />
+              <Mic className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
               Iniciar Gravação
             </Button>
           ) : (
@@ -367,10 +410,10 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
               onClick={stopRecording}
               variant="destructive"
               size="lg"
-              className="min-w-32"
+              className="min-w-32 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-red-500/25 animate-pulse-soft"
               disabled={recordingState === 'processing'}
             >
-              <Square className="w-4 h-4 mr-2 fill-current" />
+              <Square className="w-4 h-4 mr-2 fill-current transition-transform duration-200" />
               Parar Gravação
             </Button>
           )}
