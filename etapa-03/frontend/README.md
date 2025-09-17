@@ -119,7 +119,7 @@ Hook para reprodução de áudio TTS:
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: 8080,
     host: true,
   },
   // ... outras configurações
@@ -210,7 +210,7 @@ Por padrão, o frontend conecta com o backend em `http://localhost:3001`. Para a
 2. Usar variável de ambiente `VITE_BACKEND_URL`
 
 ### CORS
-O backend deve estar configurado para aceitar conexões do frontend na porta 5173.
+O backend deve estar configurado para aceitar conexões do frontend na porta 8080.
 
 ---
 

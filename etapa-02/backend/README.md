@@ -78,7 +78,7 @@ BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
 
 # Server Configuration
 PORT=3001
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:8080
 NODE_ENV=development
 ```
 

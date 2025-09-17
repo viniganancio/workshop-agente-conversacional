@@ -123,7 +123,7 @@ ELEVENLABS_MODEL=eleven_multilingual_v2
 
 # Configurações do Servidor
 PORT=3001
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:8080
 NODE_ENV=development
 ```
 
@@ -159,7 +159,7 @@ npm run dev
 ```
 
 ### 3. Acesse a Aplicação
-Abra seu navegador e acesse: `http://localhost:5173`
+Abra seu navegador e acesse: `http://localhost:8080`
 
 ### 4. Experimente a Conversa Inteligente
 

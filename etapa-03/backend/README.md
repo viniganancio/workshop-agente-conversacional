@@ -93,7 +93,7 @@ ELEVENLABS_MODEL=eleven_multilingual_v2
 
 # Server Configuration
 PORT=3001
-CORS_ORIGIN=http://localhost:5173
+CORS_ORIGIN=http://localhost:8080
 NODE_ENV=development
 ```
 
