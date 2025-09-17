@@ -1,6 +1,9 @@
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 import { serverConfig } from '@/utils/config.js';
 import { logger } from '@/utils/logger.js';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 export interface AIResponse {
   text: string;
@@ -20,6 +23,7 @@ export class BedrockService {
   private client: BedrockRuntimeClient;
   private modelId: string;
   private conversations: Map<string, ConversationContext> = new Map();
+  private systemPrompt: string;
 
   constructor() {
     this.client = new BedrockRuntimeClient({
@@ -30,6 +34,22 @@ export class BedrockService {
       },
     });
     this.modelId = serverConfig.bedrockModelId;
+    this.systemPrompt = this.loadSystemPrompt();
+  }
+
+  private loadSystemPrompt(): string {
+    try {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
+      const promptPath = join(__dirname, '..', 'prompts', 'system-prompt.txt');
+
+      const prompt = readFileSync(promptPath, 'utf-8');
+      logger.info('📝 System prompt loaded successfully');
+      return prompt.trim();
+    } catch (error) {
+      logger.error('Failed to load system prompt, using fallback', { error });
+      return 'Você é um assistente conversacional inteligente em português brasileiro. Responda de forma natural, útil e concisa às mensagens do usuário. Mantenha um tom amigável e profissional.';
+    }
   }
 
   async generateResponse(
@@ -51,8 +71,7 @@ export class BedrockService {
         timestamp: Date.now(),
       });
 
-      // Prepare the conversation for Claude
-      const systemPrompt = `Você é um assistente conversacional inteligente em português brasileiro. Responda de forma natural, útil e concisa às mensagens do usuário. Mantenha um tom amigável e profissional.`;
+      // Use the loaded system prompt
 
       const messages = context.messages.map(msg => ({
         role: msg.role,
@@ -62,7 +81,7 @@ export class BedrockService {
       const requestBody = {
         anthropic_version: 'bedrock-2023-05-31',
         max_tokens: 1000,
-        system: systemPrompt,
+        system: this.systemPrompt,
         messages: messages,
         temperature: 0.7,
       };
@@ -183,5 +202,14 @@ export class BedrockService {
 
   getConversationHistory(sessionId: string): ConversationContext | null {
     return this.conversations.get(sessionId) || null;
+  }
+
+  reloadSystemPrompt(): void {
+    this.systemPrompt = this.loadSystemPrompt();
+    logger.info('🔄 System prompt reloaded');
+  }
+
+  getCurrentSystemPrompt(): string {
+    return this.systemPrompt;
   }
 }

@@ -1,0 +1,66 @@
+export interface TranscriptionResult {
+  text: string;
+  confidence: number;
+  words?: Array<{
+    word: string;
+    start: number;
+    end: number;
+    confidence: number;
+  }>;
+  isInterim: boolean;
+  timestamp: number;
+}
+
+export interface AudioChunk {
+  data: Buffer;
+  timestamp: number;
+  clientId: string;
+}
+
+export interface ClientSession {
+  id: string;
+  socket: any; // Socket.IO socket
+  deepgramConnection?: any;
+  isRecording: boolean;
+  startTime?: number;
+}
+
+export interface ServerConfig {
+  port: number;
+  corsOrigin: string;
+  deepgramApiKey: string;
+  audioSampleRate: number;
+  audioEncoding: string;
+  deepgramModel: string;
+  deepgramLanguage: string;
+  smartFormat: boolean;
+  interimResults: boolean;
+  endpointing: number;
+  utterances: boolean;
+}
+
+export interface SocketEvents {
+  // Client to Server
+  'start-recording': () => void;
+  'stop-recording': () => void;
+  'audio-chunk': (chunk: ArrayBuffer) => void;
+  'disconnect': () => void;
+
+  // Server to Client
+  'recording-started': () => void;
+  'recording-stopped': () => void;
+  'transcription-result': (result: TranscriptionResult) => void;
+  'transcription-error': (error: string) => void;
+  'connection-status': (status: 'connected' | 'disconnected' | 'error') => void;
+}
+
+export interface DeepgramConfig {
+  model: string;
+  language: string;
+  smart_format: boolean;
+  interim_results: boolean;
+  endpointing: number;
+  sample_rate: number;
+  encoding: string;
+  utterances: boolean;
+}

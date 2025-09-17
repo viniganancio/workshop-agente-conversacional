@@ -1,0 +1,150 @@
+/* Import Inter font for clean, modern look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  :root {
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 10%; /* Dark gray */
+
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 0 0% 10%; /* Dark gray */
+
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 0 0% 10%; /* Dark gray */
+
+    --primary: 262 83% 58%; /* #8B5CF6 - Purple for audio theme */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 0 0% 96%; /* Light gray */
+    --secondary-foreground: 0 0% 10%; /* Dark gray */
+
+    --muted: 210 40% 95%; /* Cool light gray */
+    --muted-foreground: 210 20% 35%; /* Cool medium gray */
+
+    --accent: 210 40% 92%; /* Cool blue-white accent */
+    --accent-foreground: 0 0% 8%; /* Almost black */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 85%; /* Light gray border */
+    --input: 210 20% 85%; /* Light gray input */
+    --ring: 262 83% 58%; /* Purple ring to match primary */
+
+    --radius: 1rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+
+  /* Apply typography styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+
+  p, span, div, a, button, input, textarea {
+    @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .glass {
+    @apply backdrop-blur-lg bg-white/80 border border-white/20 shadow-sm;
+  }
+  
+  .glass-dark {
+    @apply backdrop-blur-lg bg-black/10 border border-white/10 shadow-sm;
+  }
+  
+  .mask-fade-out-r {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+  
+  .mask-fade-out-l {
+    mask-image: linear-gradient(to left, black 85%, transparent 100%);
+  }
+  
+  .text-shadow {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .bg-audio-gradient {
+    background: linear-gradient(to bottom, #F8FAFC 80%, #8B5CF6 100%);
+  }
+
+  .audio-bg {
+    background-color: #F8FAFC;
+  }
+
+  /* Animation delay utilities for smooth microphone effects */
+  .animation-delay-75 {
+    animation-delay: 75ms;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  /* Custom keyframes for smoother microphone animations */
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+    }
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 1.5s ease-in-out infinite;
+  }
+}
