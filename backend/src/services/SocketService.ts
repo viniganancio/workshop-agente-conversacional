@@ -1,13 +1,15 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HTTPServer } from 'http';
-import { ClientSession, SocketEvents, TranscriptionResult } from '@/types/index.js';
+import { ClientSession, SocketEvents, TranscriptionResult, AIResponse } from '@/types/index.js';
 import { DeepgramService } from './DeepgramService.js';
+import { BedrockService } from './BedrockService.js';
 import { serverConfig } from '@/utils/config.js';
 import { logger } from '@/utils/logger.js';
 
 export class SocketService {
   private io: SocketIOServer;
   private deepgramService: DeepgramService;
+  private bedrockService: BedrockService;
   private sessions = new Map<string, ClientSession>();
 
   constructor(httpServer: HTTPServer) {
@@ -22,6 +24,7 @@ export class SocketService {
     });
 
     this.deepgramService = new DeepgramService();
+    this.bedrockService = new BedrockService();
     this.setupEventHandlers();
   }
 
@@ -76,8 +79,20 @@ export class SocketService {
       // Create Deepgram connection and pass the socket
       session.deepgramConnection = this.deepgramService.createLiveConnection(
         session.socket,
-        (result: TranscriptionResult) => {
+        async (result: TranscriptionResult) => {
           session.socket.emit('transcription-result', result);
+
+          // Generate AI response for final transcriptions only
+          if (!result.isInterim && result.text.trim()) {
+            try {
+              logger.info(`🤖 Generating AI response for: "${result.text}"`);
+              const aiResponse = await this.bedrockService.generateResponse(result.text, session.id);
+              session.socket.emit('ai-response', aiResponse);
+            } catch (error) {
+              logger.error('AI response generation failed', { sessionId: session.id, error });
+              session.socket.emit('ai-error', `Failed to generate AI response: ${error}`);
+            }
+          }
         },
         (error: string) => {
           logger.error('Transcription error', { sessionId: session.id, error });
@@ -177,5 +192,9 @@ export class SocketService {
 
   public async testDeepgramConnection(): Promise<boolean> {
     return await this.deepgramService.testConnection();
+  }
+
+  public async testBedrockConnection(): Promise<boolean> {
+    return await this.bedrockService.testConnection();
   }
 }

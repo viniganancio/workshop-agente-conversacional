@@ -37,6 +37,10 @@ export interface ServerConfig {
   interimResults: boolean;
   endpointing: number;
   utterances: boolean;
+  awsRegion: string;
+  awsAccessKeyId: string;
+  awsSecretAccessKey: string;
+  bedrockModelId: string;
 }
 
 export interface SocketEvents {
@@ -52,6 +56,14 @@ export interface SocketEvents {
   'transcription-result': (result: TranscriptionResult) => void;
   'transcription-error': (error: string) => void;
   'connection-status': (status: 'connected' | 'disconnected' | 'error') => void;
+  'ai-response': (response: AIResponse) => void;
+  'ai-error': (error: string) => void;
+}
+
+export interface AIResponse {
+  text: string;
+  timestamp: number;
+  confidence?: number;
 }
 
 export interface DeepgramConfig {

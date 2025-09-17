@@ -24,6 +24,7 @@
   "author": "Vini Ganancio <contato@viniganancio.dev>",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.890.0",
     "@deepgram/sdk": "^3.4.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",

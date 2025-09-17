@@ -4,7 +4,13 @@ import { ServerConfig } from '@/types/index.js';
 // Load environment variables
 config();
 
-const requiredEnvVars = ['DEEPGRAM_API_KEY'];
+const requiredEnvVars = [
+  'DEEPGRAM_API_KEY',
+  'AWS_REGION',
+  'AWS_ACCESS_KEY_ID',
+  'AWS_SECRET_ACCESS_KEY',
+  'BEDROCK_MODEL_ID'
+];
 
 // Validate required environment variables
 for (const envVar of requiredEnvVars) {
@@ -25,6 +31,10 @@ export const serverConfig: ServerConfig = {
   interimResults: process.env.DEEPGRAM_INTERIM_RESULTS === 'true',
   endpointing: parseInt(process.env.DEEPGRAM_ENDPOINTING || '300', 10),
   utterances: process.env.DEEPGRAM_UTTERANCES === 'true',
+  awsRegion: process.env.AWS_REGION!,
+  awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+  awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  bedrockModelId: process.env.BEDROCK_MODEL_ID!,
 };
 
 export const isDevelopment = process.env.NODE_ENV === 'development';
