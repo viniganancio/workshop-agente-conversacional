@@ -60,7 +60,4 @@ html_theme_options = {
 # html_logo = '_static/logo.png'
 
 # -- MyST configuration ------------------------------------------------------
-source_suffix = {
-    '.rst': None,
-    '.md': None,
-}
+source_suffix = ['.rst', '.md']
