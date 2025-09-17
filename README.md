@@ -1,231 +1,274 @@
 # 🎤 Workshop Agente Conversacional
 
-Um workshop demonstrativo para criação de um agente conversacional que captura áudio em tempo real, transcreve usando Deepgram e exibe os resultados de forma elegante.
+Um workshop completo demonstrando como criar um agente conversacional inteligente que captura áudio em tempo real, transcreve com Deepgram, gera respostas inteligentes com AWS Bedrock Claude e converte texto em voz com ElevenLabs.
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-pronto-brightgreen)
 ![React](https://img.shields.io/badge/React-18.3.1-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green)
 ![Deepgram](https://img.shields.io/badge/Deepgram-API-purple)
+![AWS Bedrock](https://img.shields.io/badge/AWS%20Bedrock-Claude-orange)
+![ElevenLabs](https://img.shields.io/badge/ElevenLabs-TTS-red)
 
 ## 📋 Índice
 
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [Configuração](#configuração)
+- [Instalação e Configuração](#instalação-e-configuração)
 - [Como Usar](#como-usar)
-- [Estrutura do Projeto](#estrutura-do-projeto)
 - [Funcionalidades](#funcionalidades)
-- [Roadmap](#roadmap)
-- [Contribuindo](#contribuindo)
+- [Estrutura do Projeto](#estrutura-do-projeto)
 - [Licença](#licença)
 
 ## 🚀 Sobre o Projeto
 
-Este projeto demonstra como criar um agente conversacional moderno que:
+Este workshop apresenta uma implementação completa de um agente conversacional inteligente que:
 
-- **Captura áudio** em tempo real do microfone do usuário
-- **Transcreve automaticamente** usando a API do Deepgram
-- **Exibe resultados** de forma elegante e responsiva
-- **Funciona em tempo real** com WebSocket para comunicação instantânea
+- **🎤 Captura áudio** em tempo real do microfone do usuário
+- **📝 Transcreve automaticamente** usando a API do Deepgram (Speech-to-Text)
+- **🤖 Gera respostas inteligentes** usando AWS Bedrock Claude Sonnet 4
+- **🔊 Converte respostas em áudio** usando ElevenLabs (Text-to-Speech)
+- **💬 Mantém conversação natural** com contexto e memória
+- **⚡ Funciona em tempo real** com WebSocket para comunicação instantânea
 
-### 🎯 Objetivos do Workshop
+### ✨ O que você aprenderá
 
-1. Aprender a capturar áudio no navegador usando MediaRecorder API
-2. Implementar comunicação em tempo real com WebSocket
-3. Integrar com API de transcrição do Deepgram
-4. Criar uma interface moderna com React e Tailwind CSS
-5. Configurar um servidor Node.js para processar áudio
+- Captura e processamento de áudio no navegador com MediaRecorder API
+- Comunicação em tempo real com WebSocket (Socket.io)
+- Integração com APIs de IA modernas (Deepgram, AWS Bedrock, ElevenLabs)
+- Desenvolvimento fullstack com React + TypeScript e Node.js + TypeScript
+- Criação de interfaces modernas e responsivas com Radix UI e Tailwind CSS
+- Arquitetura de aplicações conversacionais
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Frontend
-- **React 18.3.1** - Biblioteca para construção da interface
-- **Vite** - Ferramenta de build rápida e moderna
+- **React 18.3.1 + TypeScript** - Framework moderno para interfaces
+- **Vite** - Build tool extremamente rápido
 - **Tailwind CSS** - Framework CSS utilitário
 - **Radix UI** - Componentes acessíveis e customizáveis
-- **Socket.io Client** - Cliente WebSocket para comunicação em tempo real
-- **Lucide React** - Ícones modernos e consistentes
+- **Socket.io Client** - Comunicação WebSocket em tempo real
+- **Lucide React** - Biblioteca de ícones moderna
 
 ### Backend
-- **Node.js** - Runtime JavaScript para servidor
-- **Express.js** - Framework web minimalista
-- **Socket.io** - Biblioteca WebSocket para comunicação bidirecional
-- **Deepgram SDK** - SDK oficial para integração com API de transcrição
-- **dotenv** - Gerenciamento de variáveis de ambiente
-- **CORS** - Middleware para controle de acesso entre origens
+- **Node.js + TypeScript** - Runtime JavaScript com tipagem estática
+- **Express.js** - Framework web minimalista e flexível
+- **Socket.io** - WebSocket para comunicação bidirecional
+- **Deepgram SDK** - Speech-to-Text em tempo real
+- **AWS Bedrock** - Acesso ao Claude Sonnet 4 para IA conversacional
+- **ElevenLabs** - Text-to-Speech de alta qualidade
+
+### Segurança & DevEx
+- **Helmet** - Headers de segurança
+- **Rate Limiting** - Proteção contra abuso
+- **CORS** - Controle de acesso entre origens
+- **ESLint + TypeScript** - Qualidade e consistência do código
 
 ## ✅ Pré-requisitos
 
-Antes de começar, certifique-se de ter instalado:
+Antes de começar, você precisará de:
 
+### Ferramentas de Desenvolvimento
 - **Node.js** (versão 18 ou superior)
 - **npm** ou **yarn**
-- **Conta no Deepgram** ([criar conta gratuita](https://deepgram.com))
 - **Navegador moderno** com suporte a MediaRecorder API
 
-## 📦 Instalação
+### Contas e Chaves de API
+- **Conta no Deepgram** ([criar conta gratuita](https://deepgram.com))
+- **Conta AWS** com acesso ao Bedrock Claude ([configurar acesso](https://docs.aws.amazon.com/bedrock/))
+- **Conta no ElevenLabs** ([criar conta](https://elevenlabs.io))
 
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/viniganancio/workshop-agente-conversacional.git
-   cd workshop-agente-conversacional
-   ```
+> **💡 Dica**: Todas as plataformas oferecem créditos gratuitos para teste!
 
-2. **Instale as dependências do frontend**
-   ```bash
-   cd frontend
-   npm install
-   ```
+## 📦 Instalação e Configuração
 
-3. **Instale as dependências do backend**
-   ```bash
-   cd ../backend
-   npm install
-   ```
+### 1. Clone e Configure o Projeto
 
-## ⚙️ Configuração
+```bash
+# Clone o repositório
+git clone https://github.com/viniganancio/workshop-agente-conversacional.git
+cd workshop-agente-conversacional
 
-### 1. Configuração do Backend
+# Este projeto tem 3 etapas - use a etapa-03 (versão completa)
+cd etapa-03
 
-Crie um arquivo `.env` na pasta `backend`:
+# Instale dependências do backend
+cd backend
+npm install
+
+# Instale dependências do frontend
+cd ../frontend
+npm install
+```
+
+### 2. Configuração das APIs
+
+Crie um arquivo `.env` na pasta `etapa-03/backend/`:
 
 ```env
-DEEPGRAM_API_KEY=sua_chave_api_deepgram_aqui
+# Deepgram (Speech-to-Text)
+DEEPGRAM_API_KEY=sua_chave_deepgram_aqui
+
+# AWS Bedrock (IA Conversacional)
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=sua_aws_access_key
+AWS_SECRET_ACCESS_KEY=sua_aws_secret_key
+BEDROCK_MODEL_ID=anthropic.claude-3-5-sonnet-20241022-v2:0
+
+# ElevenLabs (Text-to-Speech)
+ELEVENLABS_API_KEY=sua_chave_elevenlabs_aqui
+ELEVENLABS_VOICE_ID=EXAVITQu4vr4xnSDxMaL
+ELEVENLABS_MODEL=eleven_multilingual_v2
+
+# Configurações do Servidor
 PORT=3001
-CORS_ORIGIN=http://localhost:8080
+CORS_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 
-### 2. Obtenha sua chave da API Deepgram
+### 3. Obtenha suas Chaves de API
 
+#### Deepgram
 1. Acesse [Deepgram Console](https://console.deepgram.com)
 2. Crie uma conta ou faça login
-3. Navegue até **API Keys**
-4. Crie uma nova chave e copie para o arquivo `.env`
+3. Navegue até **API Keys** e crie uma nova chave
 
-### 3. Configuração do Frontend
+#### AWS Bedrock
+1. Acesse [AWS Console](https://console.aws.amazon.com)
+2. Configure acesso ao Bedrock Claude na região us-east-1
+3. Crie credenciais IAM com permissões para Bedrock
 
-O frontend já está configurado para se conectar com o backend na porta 3001.
+#### ElevenLabs
+1. Acesse [ElevenLabs](https://elevenlabs.io)
+2. Crie uma conta e navegue até **Profile → API Key**
+3. Use o voice ID padrão ou escolha uma voz diferente
 
 ## 🚀 Como Usar
 
-### 1. Inicie o Backend
+### 1. Execute o Backend
 ```bash
-cd backend
+cd etapa-03/backend
 npm run dev
 ```
 
-### 2. Inicie o Frontend
+### 2. Execute o Frontend (novo terminal)
 ```bash
-cd frontend
+cd etapa-03/frontend
 npm run dev
 ```
 
-### 3. Acesse a aplicação
-Abra seu navegador e acesse: `http://localhost:8080`
+### 3. Acesse a Aplicação
+Abra seu navegador e acesse: `http://localhost:5173`
 
-### 4. Teste a funcionalidade
-1. Clique no botão **"Iniciar Gravação"**
-2. Permita o acesso ao microfone quando solicitado
-3. Fale normalmente - a transcrição aparecerá em tempo real
-4. Clique em **"Parar Gravação"** para finalizar
+### 4. Experimente a Conversa Inteligente
+
+1. **🎤 Inicie a gravação**: Clique no botão "Iniciar Gravação"
+2. **🔓 Permita acesso**: Autorize o uso do microfone
+3. **💬 Converse naturalmente**: Fale em português - sua voz será transcrita em tempo real
+4. **🤖 Receba respostas**: O Claude gerará respostas inteligentes automaticamente
+5. **🔊 Ouça as respostas**: As respostas são convertidas em áudio e reproduzidas
+6. **🔄 Continue a conversa**: Mantenha um diálogo natural e fluido
+7. **⏹️ Pare quando quiser**: Clique em "Parar Gravação" para finalizar
+
+### 5. Recursos Adicionais
+
+- **📋 Histórico**: Veja todo o histórico da conversa na tela
+- **🔄 Limpar**: Use o botão de limpeza para começar uma nova conversa
+- **⚡ Tempo real**: Tudo funciona em tempo real sem delays perceptíveis
 
 ## 📁 Estrutura do Projeto
 
 ```
 workshop-agente-conversacional/
-├── frontend/                 # Aplicação React
-│   ├── src/
-│   │   ├── components/       # Componentes reutilizáveis
-│   │   │   └── ui/          # Componentes de UI (Radix)
-│   │   ├── hooks/           # Custom hooks
-│   │   ├── lib/             # Utilitários e configurações
-│   │   ├── App.tsx          # Componente principal
-│   │   └── main.tsx         # Ponto de entrada
-│   ├── package.json
-│   └── vite.config.ts
-├── backend/                  # Servidor Node.js
-│   ├── src/
-│   │   ├── controllers/     # Controladores de rota
-│   │   ├── services/        # Lógica de negócio
-│   │   └── server.js        # Servidor principal
-│   ├── package.json
-│   └── .env.example
+├── etapa-01/                # Etapa 1: Transcrição básica
+├── etapa-02/                # Etapa 2: + IA conversacional
+├── etapa-03/                # Etapa 3: Workshop completo ⭐
+│   ├── frontend/            # React + TypeScript
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── AudioRecorder.tsx
+│   │   │   │   ├── TranscriptionDisplay.tsx
+│   │   │   │   └── ui/      # Radix UI components
+│   │   │   ├── hooks/
+│   │   │   │   ├── useWebSocket.ts
+│   │   │   │   ├── useAudioPlayer.ts
+│   │   │   │   └── use-*.ts
+│   │   │   ├── lib/utils.ts
+│   │   │   └── App.tsx
+│   │   └── package.json
+│   └── backend/             # Node.js + TypeScript
+│       ├── src/
+│       │   ├── controllers/ # Health checks
+│       │   ├── middleware/  # Security & validation
+│       │   ├── services/
+│       │   │   ├── DeepgramService.ts    # STT
+│       │   │   ├── BedrockService.ts     # IA
+│       │   │   ├── ElevenLabsService.ts  # TTS
+│       │   │   └── SocketService.ts      # WebSocket
+│       │   ├── types/       # TypeScript definitions
+│       │   ├── utils/       # Config & logging
+│       │   └── server.ts
+│       └── package.json
 ├── README.md
-└── CLAUDE.md                # Instruções para o Claude Code
 ```
 
-## ✨ Funcionalidades
+## ✨ Funcionalidades Implementadas
 
-### Implementadas
-- [x] Interface moderna e responsiva
-- [x] Estrutura básica do projeto
-- [x] Configuração do ambiente de desenvolvimento
+### 🎤 Captura e Processamento de Áudio
+- ✅ Gravação de áudio em tempo real via MediaRecorder API
+- ✅ Processamento de chunks de áudio otimizado para streaming
+- ✅ Feedback visual durante gravação (animação de pulso)
+- ✅ Tratamento de permissões de microfone
 
-### Em Desenvolvimento
-- [ ] 🎤 Captura de áudio do microfone
-- [ ] 🔗 Conexão WebSocket frontend-backend
-- [ ] 🖥️ Servidor Node.js com Express e Socket.io
-- [ ] 🎯 Integração com API Deepgram
-- [ ] 📝 Exibição de transcrição em tempo real
-- [ ] 🎨 Animações e feedback visual
-- [ ] ⚠️ Tratamento de erros e estados de loading
+### 🌐 Comunicação em Tempo Real
+- ✅ WebSocket bidirecional com Socket.io
+- ✅ Streaming de áudio em tempo real para o backend
+- ✅ Reconexão automática em caso de perda de conexão
+- ✅ Monitoramento de status de conexão
 
-### Futuras Melhorias
-- [ ] 🌙 Modo escuro/claro
-- [ ] 📱 Otimização para dispositivos móveis
-- [ ] 💾 Histórico de transcrições
-- [ ] 🔄 Reconexão automática WebSocket
-- [ ] 🎵 Visualização de áudio durante gravação
-- [ ] 🌍 Suporte a múltiplos idiomas
-- [ ] 📊 Métricas de qualidade da transcrição
+### 🧠 Inteligência Artificial
+- ✅ **Speech-to-Text**: Transcrição em tempo real com Deepgram (português brasileiro)
+- ✅ **IA Conversacional**: Respostas inteligentes com AWS Bedrock Claude Sonnet 4
+- ✅ **Text-to-Speech**: Síntese de voz natural com ElevenLabs
+- ✅ Manutenção de contexto conversacional
 
-## 🗓️ Roadmap
+### 💎 Interface e Experiência
+- ✅ Design moderno e responsivo com Tailwind CSS
+- ✅ Componentes acessíveis com Radix UI
+- ✅ Animações suaves e feedback visual
+- ✅ Exibição de transcrições com resultados intermediários e finais
+- ✅ Player de áudio integrado para respostas TTS
+- ✅ Histórico completo da conversa
 
-### Fase 1: Fundação (Atual)
-- ✅ Setup inicial do projeto
-- ✅ Estrutura de pastas e configurações
-- ⏳ Componente de gravação de áudio
+### 🔒 Segurança e Performance
+- ✅ Headers de segurança com Helmet
+- ✅ Rate limiting para proteção contra abuso
+- ✅ CORS configurado adequadamente
+- ✅ Tratamento robusto de erros
+- ✅ TypeScript para type safety
 
-### Fase 2: Backend e Integração
-- ⏳ Servidor Node.js com Socket.io
-- ⏳ Integração com Deepgram SDK
-- ⏳ Processamento de áudio em streaming
+## 🎯 Estrutura de Aprendizado
 
-### Fase 3: Interface e UX
-- ⏳ Componente de exibição de transcrição
-- ⏳ Estados de loading e erro
-- ⏳ Animações e transições
+Este workshop está organizado em 3 etapas progressivas:
 
-### Fase 4: Melhorias e Otimização
-- ⏳ Tratamento avançado de erros
-- ⏳ Otimizações de performance
-- ⏳ Testes automatizados
+### 📁 Etapa 01 - Transcrição Básica
+- Captura de áudio + Deepgram
+- Transcrição em tempo real
+- Interface básica
 
-## 🤝 Contribuindo
+### 📁 Etapa 02 - IA Conversacional
+- Adição do AWS Bedrock Claude
+- Respostas inteligentes
+- Contexto conversacional
 
-Contribuições são sempre bem-vindas! Para contribuir:
+### 📁 Etapa 03 - Workshop Completo 🎖️
+- **Text-to-Speech com ElevenLabs**
+- **Conversa completa por voz**
+- **Interface polida e profissional**
+- **Todas as funcionalidades integradas**
 
-1. **Fork** o projeto
-2. Crie uma **branch** para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um **Pull Request**
-
-### 🏷️ Convenções de Commit
-
-Usamos o padrão [Conventional Commits](https://www.conventionalcommits.org/pt-br/):
-
-```
-feat: adiciona componente de gravação de áudio
-fix: corrige erro de conexão WebSocket
-docs: atualiza README com instruções de instalação
-style: ajusta formatação do código
-refactor: refatora serviço de transcrição
-test: adiciona testes para componente AudioRecorder
-```
+> **💡 Recomendação**: Use a `etapa-03` para experiência completa ou explore as etapas anteriores para entender a evolução do projeto.
 
 ## 📄 Licença
 
@@ -233,19 +276,15 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-## 📞 Suporte
-
-Se você tem alguma dúvida ou precisa de ajuda:
-
-- 🐛 **Issues**: Para bugs e problemas técnicos
-- 💡 **Discussions**: Para ideias e discussões gerais
-- 📧 **Email**: [contato@viniganancio.dev](mailto:contato@viniganancio.dev)
-
----
-
 <div align="center">
 
-**Feito com ❤️ por Vini Ganancio para a comunidade de desenvolvedores**
+### 🎉 Workshop Pronto para Uso!
+
+**Este é um projeto completo e funcional demonstrando as mais modernas tecnologias de IA conversacional.**
+
+Desenvolvido por **Vini Ganancio** para a comunidade de desenvolvedores
+
+📧 [contato@viniganancio.dev](mailto:contato@viniganancio.dev)
 
 [⬆ Voltar ao topo](#-workshop-agente-conversacional)
 
