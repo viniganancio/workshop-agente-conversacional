@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mic, MicOff, Square, Loader2, Wifi, WifiOff, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Mic, MicOff, Square, Loader2, Wifi, WifiOff, RefreshCw, AlertTriangle, Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWebSocket } from '@/hooks/useWebSocket';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useToast } from '@/hooks/use-toast';
 
 type RecordingState = 'idle' | 'recording' | 'processing' | 'error';
@@ -28,6 +29,14 @@ interface AIResponse {
   confidence?: number;
 }
 
+interface TTSResponse {
+  audioData: string; // Base64 encoded audio
+  text: string;
+  timestamp: number;
+  voiceId: string;
+  format: string;
+}
+
 interface AudioRecorderProps {
   onTranscription?: (result: TranscriptionResult) => void;
   onAIResponse?: (response: AIResponse) => void;
@@ -49,6 +58,9 @@ export default function AudioRecorder({ onTranscription, onAIResponse, onConnect
   const animationFrameRef = useRef<number>();
   const intervalRef = useRef<NodeJS.Timeout>();
 
+  // Audio player for TTS
+  const { isPlaying: isTTSPlaying, playAudio, currentlyPlayingText } = useAudioPlayer();
+
   // WebSocket connection
   const {
     isConnected,
@@ -65,6 +77,19 @@ export default function AudioRecorder({ onTranscription, onAIResponse, onConnect
     },
     onAIResponse: (response: AIResponse) => {
       onAIResponse?.(response);
+    },
+    onTTSAudio: async (audio: TTSResponse) => {
+      try {
+        console.log('🔊 Playing TTS audio:', audio.text.substring(0, 50) + '...');
+        await playAudio(audio);
+      } catch (error) {
+        console.error('Failed to play TTS audio:', error);
+        toast({
+          title: "Erro de reprodução",
+          description: "Não foi possível reproduzir o áudio da resposta.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: string) => {
       console.error('WebSocket error:', error);
@@ -322,6 +347,14 @@ export default function AudioRecorder({ onTranscription, onAIResponse, onConnect
                isConnected ? 'Conectado' : 'Desconectado'}
             </Badge>
           </div>
+          {isTTSPlaying && (
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-3 h-3 text-blue-500 animate-pulse" />
+              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                🔊 Reproduzindo
+              </Badge>
+            </div>
+          )}
         </div>
       </CardHeader>
 
@@ -400,6 +433,21 @@ export default function AudioRecorder({ onTranscription, onAIResponse, onConnect
               {formatTime(recordingTime)}
             </div>
             <p className="text-sm text-muted-foreground">Tempo de gravação</p>
+          </div>
+        )}
+
+        {/* TTS Playback Status */}
+        {isTTSPlaying && currentlyPlayingText && (
+          <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-center mb-2">
+              <Volume2 className="w-4 h-4 text-blue-600 mr-2 animate-pulse" />
+              <p className="text-blue-700 font-semibold text-sm">
+                Reproduzindo resposta da IA
+              </p>
+            </div>
+            <p className="text-blue-600 text-xs max-w-md mx-auto line-clamp-2">
+              "{currentlyPlayingText.length > 80 ? currentlyPlayingText.substring(0, 80) + '...' : currentlyPlayingText}"
+            </p>
           </div>
         )}
 

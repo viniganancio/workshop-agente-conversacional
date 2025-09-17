@@ -20,10 +20,19 @@ interface AIResponse {
   confidence?: number;
 }
 
+interface TTSResponse {
+  audioData: string; // Base64 encoded audio
+  text: string;
+  timestamp: number;
+  voiceId: string;
+  format: string;
+}
+
 interface UseWebSocketProps {
   url?: string;
   onTranscription?: (result: TranscriptionResult) => void;
   onAIResponse?: (response: AIResponse) => void;
+  onTTSAudio?: (audio: TTSResponse) => void;
   onError?: (error: string) => void;
   autoConnect?: boolean;
   maxRetries?: number;
@@ -46,6 +55,7 @@ export const useWebSocket = ({
   url = 'http://localhost:3001',
   onTranscription,
   onAIResponse,
+  onTTSAudio,
   onError,
   autoConnect = true,
   maxRetries = 5
@@ -189,7 +199,17 @@ export const useWebSocket = ({
       onError?.(error);
     });
 
-  }, [url, onTranscription, onAIResponse, onError]);
+    socketRef.current.on('tts-audio', (audio: TTSResponse) => {
+      console.log('Received TTS audio:', { textLength: audio.text.length, voiceId: audio.voiceId });
+      onTTSAudio?.(audio);
+    });
+
+    socketRef.current.on('tts-error', (error: string) => {
+      console.error('TTS error:', error);
+      onError?.(error);
+    });
+
+  }, [url, onTranscription, onAIResponse, onTTSAudio, onError]);
 
   const disconnect = useCallback(() => {
     console.log('🛑 Disconnecting...');
