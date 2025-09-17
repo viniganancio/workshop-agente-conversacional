@@ -36,6 +36,7 @@ export interface ServerConfig {
   smartFormat: boolean;
   interimResults: boolean;
   endpointing: number;
+  utterances: boolean;
 }
 
 export interface SocketEvents {
@@ -61,4 +62,5 @@ export interface DeepgramConfig {
   endpointing: number;
   sample_rate: number;
   encoding: string;
+  utterances: boolean;
 }

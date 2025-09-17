@@ -17,6 +17,7 @@ export class DeepgramService {
       endpointing: serverConfig.endpointing,
       sample_rate: serverConfig.audioSampleRate,
       encoding: serverConfig.audioEncoding,
+      utterances: serverConfig.utterances,
     };
   }
 
@@ -26,14 +27,15 @@ export class DeepgramService {
     onError: (error: string) => void
   ) {
     try {
-      // Use webm encoding to match browser MediaRecorder output
+      // Use configuration from environment variables
       const config = {
-        model: 'nova-2',
-        language: 'pt-BR',
-        smart_format: true,
-        interim_results: true,
-        encoding: 'linear16',
-        sample_rate: 16000
+        model: this.config.model,
+        language: this.config.language,
+        smart_format: this.config.smart_format,
+        interim_results: this.config.interim_results,
+        encoding: this.config.encoding,
+        sample_rate: this.config.sample_rate,
+        utterances: this.config.utterances
       };
 
       const connection = this.deepgram.listen.live(config);
