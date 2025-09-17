@@ -53,6 +53,7 @@ export const useWebSocket = ({
   const retryCountRef = useRef(0);
   const canRetryRef = useRef(true);
   const isConnectingRef = useRef(false); // Track if we're already trying to connect
+  const isRecordingRef = useRef(false); // Track recording state with ref
 
   const scheduleRetry = useCallback(() => {
     // Increment retry count first
@@ -151,12 +152,12 @@ export const useWebSocket = ({
     });
 
     socketRef.current.on('recording-started', () => {
-      console.log('Recording started on server');
+      isRecordingRef.current = true;
       setIsRecording(true);
     });
 
     socketRef.current.on('recording-stopped', () => {
-      console.log('Recording stopped on server');
+      isRecordingRef.current = false;
       setIsRecording(false);
     });
 
@@ -211,14 +212,10 @@ export const useWebSocket = ({
   }, []);
 
   const sendAudioChunk = useCallback((chunk: ArrayBuffer) => {
-    if (socketRef.current?.connected && isRecording) {
-      console.log('📤 Sending audio chunk via socket.send():', chunk.byteLength, 'bytes');
-      // Send as raw message to match working example
+    if (socketRef.current?.connected && isRecordingRef.current) {
       socketRef.current.send(chunk);
-    } else {
-      console.warn('⚠️ Cannot send audio - socket not connected or not recording');
     }
-  }, [isRecording]);
+  }, []);
 
   useEffect(() => {
     if (autoConnect) {

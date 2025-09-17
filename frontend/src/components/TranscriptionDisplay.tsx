@@ -163,8 +163,8 @@ export default function TranscriptionDisplay({
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col">
-        <ScrollArea
-          className="flex-1 w-full rounded-md border p-4"
+        <div
+          className="w-full rounded-md border h-[500px] overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
           ref={scrollAreaRef}
         >
           <div className="space-y-4">
@@ -239,7 +239,7 @@ export default function TranscriptionDisplay({
 
             <div ref={endRef} />
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Statistics */}
         {finalSegments.length > 0 && (

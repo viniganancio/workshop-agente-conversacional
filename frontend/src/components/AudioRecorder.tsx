@@ -34,9 +34,11 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
   const [audioLevel, setAudioLevel] = useState(0);
 
   const { toast } = useToast();
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const isRecordingRef = useRef<boolean>(false);
   const animationFrameRef = useRef<number>();
   const intervalRef = useRef<NodeJS.Timeout>();
 
@@ -87,12 +89,57 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
     }
   };
 
-  const setupAudioAnalyser = (stream: MediaStream) => {
-    audioContextRef.current = new AudioContext();
+  // Convert Float32Array to 16-bit PCM
+  const convertToPCM16 = (float32Array: Float32Array): ArrayBuffer => {
+    const buffer = new ArrayBuffer(float32Array.length * 2);
+    const view = new DataView(buffer);
+    let offset = 0;
+    for (let i = 0; i < float32Array.length; i++, offset += 2) {
+      let sample = Math.max(-1, Math.min(1, float32Array[i]));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, sample, true); // little-endian
+    }
+    return buffer;
+  };
+
+  const setupPCMAudioProcessing = (stream: MediaStream) => {
+    streamRef.current = stream;
+
+    // Create audio context with 16kHz sample rate to match Deepgram
+    audioContextRef.current = new AudioContext({ sampleRate: 16000 });
+
+    // Create analyser for visualization
     analyserRef.current = audioContextRef.current.createAnalyser();
-    const source = audioContextRef.current.createMediaStreamSource(stream);
-    source.connect(analyserRef.current);
     analyserRef.current.fftSize = 256;
+
+    // Create script processor for raw audio data
+    processorRef.current = audioContextRef.current.createScriptProcessor(4096, 1, 1);
+
+    // Create source from microphone stream
+    const source = audioContextRef.current.createMediaStreamSource(stream);
+
+    // Connect: source -> analyser (for visualization)
+    source.connect(analyserRef.current);
+
+    // Connect: source -> processor (for PCM data extraction)
+    source.connect(processorRef.current);
+    processorRef.current.connect(audioContextRef.current.destination);
+
+    // Process audio data and send as PCM
+    processorRef.current.onaudioprocess = (event) => {
+      if (isRecordingRef.current) {
+        const inputBuffer = event.inputBuffer;
+        const inputData = inputBuffer.getChannelData(0); // Get mono channel
+
+        // Debug: log audio processing
+        console.log('🎵 Processing audio chunk:', inputData.length, 'samples');
+
+        // Convert to 16-bit PCM and send
+        const pcmData = convertToPCM16(inputData);
+        console.log('🔊 Sending PCM data:', pcmData.byteLength, 'bytes');
+        sendAudioChunk(pcmData);
+      }
+    };
 
     const updateAudioLevel = () => {
       if (!analyserRef.current) return;
@@ -144,65 +191,23 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 16000, // Match working example and backend
+          sampleRate: 16000, // Match Deepgram requirements
           channelCount: 1
         }
       });
 
-      setupAudioAnalyser(stream);
+      setupPCMAudioProcessing(stream);
 
-      // Check for supported MIME types
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : MediaRecorder.isTypeSupported('audio/webm')
-        ? 'audio/webm'
-        : 'audio/wav';
-
-      mediaRecorderRef.current = new MediaRecorder(stream, {
-        mimeType: mimeType
-      });
-
-      const audioChunks: Blob[] = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        console.log('🎵 MediaRecorder ondataavailable:', event.data.size, 'bytes');
-        if (event.data.size > 0) {
-          audioChunks.push(event.data);
-          // Convert to PCM format before sending
-          event.data.arrayBuffer().then(buffer => {
-            console.log('🔄 Converting blob to ArrayBuffer:', buffer.byteLength, 'bytes');
-            // For now, send the raw buffer - we'll convert on the server side
-            sendAudioChunk(buffer);
-          });
-        } else {
-          console.warn('⚠️ MediaRecorder generated empty audio chunk');
-        }
-      };
-
-      mediaRecorderRef.current.onstart = () => {
-        setRecordingState('recording');
-        setRecordingTime(0);
-        startServerRecording(); // Start recording on server
-        intervalRef.current = setInterval(() => {
-          setRecordingTime(prev => prev + 1);
-        }, 1000);
-      };
-
-      mediaRecorderRef.current.onstop = () => {
-        setRecordingState('idle');
-        setAudioLevel(0);
-        stopServerRecording(); // Stop recording on server
-        stream.getTracks().forEach(track => track.stop());
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-        if (audioContextRef.current) {
-          audioContextRef.current.close();
-        }
-      };
-
-      mediaRecorderRef.current.start(100); // Send chunks every 100ms
+      // Start recording
+      setRecordingState('recording');
+      isRecordingRef.current = true; // Set ref for audio processing
+      setRecordingTime(0);
       setPermissionStatus('granted');
+      startServerRecording(); // Start recording on server
+
+      intervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
 
     } catch (error) {
       console.error('Failed to start recording:', error);
@@ -217,8 +222,35 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && recordingState === 'recording') {
-      mediaRecorderRef.current.stop();
+    if (recordingState === 'recording') {
+      setRecordingState('idle');
+      isRecordingRef.current = false; // Stop audio processing
+      setAudioLevel(0);
+      stopServerRecording(); // Stop recording on server
+
+      // Clean up audio processing
+      if (processorRef.current) {
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
+
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     }
   };
 
