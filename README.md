@@ -34,7 +34,7 @@ Este workshop apresenta uma implementação completa de um agente conversacional
 
 ### ✨ O que você aprenderá
 
-- Captura e processamento de áudio no navegador com MediaRecorder API
+- Captura e processamento de áudio no navegador com Web Audio API
 - Comunicação em tempo real com WebSocket (Socket.io)
 - Integração com APIs de IA modernas (Deepgram, AWS Bedrock, ElevenLabs)
 - Desenvolvimento fullstack com React + TypeScript e Node.js + TypeScript
@@ -72,7 +72,7 @@ Antes de começar, você precisará de:
 ### Ferramentas de Desenvolvimento
 - **Node.js** (versão 18 ou superior)
 - **npm** ou **yarn**
-- **Navegador moderno** com suporte a MediaRecorder API
+- **Navegador moderno** com suporte a Web Audio API
 
 ### Contas e Chaves de API
 - **Conta no Deepgram** ([criar conta gratuita](https://deepgram.com))
@@ -216,7 +216,7 @@ workshop-agente-conversacional/
 ## ✨ Funcionalidades Implementadas
 
 ### 🎤 Captura e Processamento de Áudio
-- ✅ Gravação de áudio em tempo real via MediaRecorder API
+- ✅ Gravação de áudio em tempo real com Web Audio API (AudioContext)
 - ✅ Processamento de chunks de áudio otimizado para streaming
 - ✅ Feedback visual durante gravação (animação de pulso)
 - ✅ Tratamento de permissões de microfone
