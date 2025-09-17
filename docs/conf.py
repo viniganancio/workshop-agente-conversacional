@@ -24,16 +24,11 @@ extensions = [
 
 # MyST parser configuration
 myst_enable_extensions = [
-    "amsmath",
-    "colon_fence",
     "deflist",
-    "dollarmath",
     "html_admonition",
-    "html_image",
     "linkify",
     "replacements",
     "smartquotes",
-    "substitution",
     "tasklist",
 ]
 
@@ -67,5 +62,5 @@ html_theme_options = {
 # -- MyST configuration ------------------------------------------------------
 source_suffix = {
     '.rst': None,
-    '.md': 'myst_parser',
+    '.md': None,
 }

@@ -18,19 +18,14 @@
 
 ## 🏗️ Arquitetura Completa
 
-```mermaid
-graph LR
-    A[🎤 Microfone] --> B[Web Audio API]
-    B --> C[WebSocket]
-    C --> D[🖥️ Backend]
-    D --> E[📝 Deepgram STT]
-    E --> D
-    D --> F[🤖 AWS Bedrock Claude]
-    F --> D
-    D --> G[🔊 ElevenLabs TTS]
-    G --> D
-    D --> C
-    C --> H[🎵 Audio Player]
+```
+🎤 Microfone → Web Audio API → WebSocket → Backend → Deepgram STT
+                                    ↑          ↓
+                                    |    AWS Bedrock Claude
+                                    |          ↓
+                                    |    ElevenLabs TTS
+                                    ↓          ↑
+                            Audio Player ← WebSocket
 ```
 
 ## 🚀 Como Executar

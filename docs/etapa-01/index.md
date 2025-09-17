@@ -16,15 +16,10 @@ Primeira etapa do workshop focada em **transcrição básica de áudio em tempo 
 
 ## 🏗️ Arquitetura
 
-```mermaid
-graph LR
-    A[🎤 Microfone] --> B[Web Audio API]
-    B --> C[WebSocket]
-    C --> D[🖥️ Backend Node.js]
-    D --> E[📝 Deepgram STT]
-    E --> D
-    D --> C
-    C --> F[🎨 Interface React]
+```
+🎤 Microfone → Web Audio API → WebSocket → Backend Node.js → Deepgram STT
+                                    ↑                              ↓
+                       Interface React ← WebSocket ←──────────────┘
 ```
 
 ## 🚀 Como Executar

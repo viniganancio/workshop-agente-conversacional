@@ -16,17 +16,12 @@ Segunda etapa que adiciona **inteligência conversacional** às transcrições u
 
 ## 🏗️ Arquitetura
 
-```mermaid
-graph LR
-    A[🎤 Microfone] --> B[Web Audio API]
-    B --> C[WebSocket]
-    C --> D[🖥️ Backend]
-    D --> E[📝 Deepgram STT]
-    E --> D
-    D --> F[🤖 AWS Bedrock Claude]
-    F --> D
-    D --> C
-    C --> G[💬 Chat Interface]
+```
+🎤 Microfone → Web Audio API → WebSocket → Backend → Deepgram STT
+                                    ↑          ↓
+                                    |    AWS Bedrock Claude
+                                    ↓          ↑
+                          Chat Interface ← WebSocket
 ```
 
 ## 🚀 Como Executar
