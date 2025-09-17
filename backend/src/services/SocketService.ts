@@ -50,10 +50,7 @@ export class SocketService {
         this.handleStopRecording(session);
       });
 
-      // Handle audio chunks
-      socket.on('audio-chunk', (chunk: ArrayBuffer) => {
-        this.handleAudioChunk(session, chunk);
-      });
+      // Note: audio message handling is now done in DeepgramService following the working example
 
       // Handle disconnect
       socket.on('disconnect', () => {
@@ -76,8 +73,9 @@ export class SocketService {
     logger.info('Starting recording', { sessionId: session.id });
 
     try {
-      // Create Deepgram connection
+      // Create Deepgram connection and pass the socket
       session.deepgramConnection = this.deepgramService.createLiveConnection(
+        session.socket,
         (result: TranscriptionResult) => {
           session.socket.emit('transcription-result', result);
         },
@@ -138,8 +136,11 @@ export class SocketService {
     }
 
     try {
-      // Convert ArrayBuffer to Buffer and send to Deepgram
+      // Convert ArrayBuffer to Buffer
       const buffer = Buffer.from(chunk);
+
+      // For now, send the raw buffer - browser MediaRecorder should be configured
+      // to output compatible format, or we'd need audio processing library
       session.deepgramConnection.send(buffer);
 
       logger.debug('Audio chunk sent to Deepgram', {

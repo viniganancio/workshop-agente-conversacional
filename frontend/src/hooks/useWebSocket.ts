@@ -212,7 +212,11 @@ export const useWebSocket = ({
 
   const sendAudioChunk = useCallback((chunk: ArrayBuffer) => {
     if (socketRef.current?.connected && isRecording) {
-      socketRef.current.emit('audio-chunk', chunk);
+      console.log('📤 Sending audio chunk via socket.send():', chunk.byteLength, 'bytes');
+      // Send as raw message to match working example
+      socketRef.current.send(chunk);
+    } else {
+      console.warn('⚠️ Cannot send audio - socket not connected or not recording');
     }
   }, [isRecording]);
 

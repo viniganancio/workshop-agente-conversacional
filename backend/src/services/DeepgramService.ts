@@ -8,6 +8,12 @@ export class DeepgramService {
   private config: DeepgramConfig;
 
   constructor() {
+    logger.info('🔑 Deepgram API Key status', {
+      hasKey: !!serverConfig.deepgramApiKey,
+      keyLength: serverConfig.deepgramApiKey?.length || 0,
+      keyPrefix: serverConfig.deepgramApiKey?.substring(0, 8) + '...'
+    });
+
     this.deepgram = createClient(serverConfig.deepgramApiKey);
     this.config = {
       model: serverConfig.deepgramModel,
@@ -19,57 +25,102 @@ export class DeepgramService {
       encoding: serverConfig.audioEncoding,
     };
 
-    // DeepgramService initialized silently
+    logger.info('🚀 DeepgramService initialized', {
+      model: serverConfig.deepgramModel,
+      language: serverConfig.deepgramLanguage,
+      encoding: serverConfig.audioEncoding,
+      sampleRate: serverConfig.audioSampleRate
+    });
   }
 
   createLiveConnection(
+    socket: any,
     onTranscription: (result: TranscriptionResult) => void,
     onError: (error: string) => void
   ) {
     try {
-      const connection = this.deepgram.listen.live(this.config);
+      // Use the same configuration as the working example
+      const config = {
+        model: 'nova-2',
+        language: 'pt-BR',
+        smart_format: true,
+        interim_results: true,
+        encoding: 'linear16',
+        sample_rate: 16000
+      };
 
+      const connection = this.deepgram.listen.live(config);
+
+      // Follow the working example exactly
       connection.on(LiveTranscriptionEvents.Open, () => {
-        logger.debug('Deepgram connection opened');
-      });
+        logger.info('✅ Deepgram connection opened successfully');
 
-      connection.on(LiveTranscriptionEvents.Transcript, (data) => {
-        logger.debug('Received transcript data', { data });
+        connection.on(LiveTranscriptionEvents.Transcript, (data) => {
+          logger.info('📝 Received transcript data', {
+            text: data.channel?.alternatives?.[0]?.transcript,
+            isFinal: data.is_final
+          });
 
-        if (data.channel?.alternatives?.[0]) {
-          const alternative = data.channel.alternatives[0];
+          if (data.channel?.alternatives?.[0]) {
+            const alternative = data.channel.alternatives[0];
 
-          if (alternative.transcript && alternative.transcript.trim()) {
-            const result: TranscriptionResult = {
-              text: alternative.transcript,
-              confidence: alternative.confidence || 0,
-              words: alternative.words?.map(word => ({
-                word: word.word,
-                start: word.start,
-                end: word.end,
-                confidence: word.confidence,
-              })),
-              isInterim: data.is_final === false,
-              timestamp: Date.now(),
-            };
+            if (alternative.transcript && alternative.transcript.trim()) {
+              const result: TranscriptionResult = {
+                text: alternative.transcript,
+                confidence: alternative.confidence || 0,
+                words: alternative.words?.map(word => ({
+                  word: word.word,
+                  start: word.start,
+                  end: word.end,
+                  confidence: word.confidence,
+                })),
+                isInterim: data.is_final === false,
+                timestamp: Date.now(),
+              };
 
-            logger.debug('Processed transcription result', { result });
-            onTranscription(result);
+              logger.info('✨ Sending transcription result to client', { text: result.text });
+              onTranscription(result);
+            }
           }
-        }
+        });
+
+        connection.on(LiveTranscriptionEvents.Error, (error) => {
+          logger.error('❌ Deepgram error inside Open', { error });
+          onError(`Deepgram error: ${error.message || 'Unknown error'}`);
+        });
+
+        // Receive audio data from client and send it to the live transcription connection
+        // This is the key part from your working example!
+        socket.on("message", (audioData: any) => {
+          logger.info('🎵 Received audio data from socket message', {
+            dataSize: audioData.length || audioData.byteLength || 'unknown',
+            connectionState: connection.getReadyState ? connection.getReadyState() : 'unknown'
+          });
+
+          try {
+            if (connection.getReadyState && connection.getReadyState() === 1) {
+              connection.send(audioData);
+              logger.debug('📤 Audio sent to Deepgram successfully');
+            } else {
+              logger.warn('⚠️ Deepgram connection not ready for audio data');
+            }
+          } catch (error) {
+            logger.error('💥 Error sending audio to Deepgram', { error });
+          }
+        });
       });
 
-      connection.on(LiveTranscriptionEvents.Error, (error) => {
-        logger.error('Deepgram error', { error });
-        onError(`Deepgram error: ${error.message || 'Unknown error'}`);
-      });
-
-      connection.on(LiveTranscriptionEvents.Close, () => {
-        logger.debug('Deepgram connection closed');
+      connection.on(LiveTranscriptionEvents.Close, (code: any, reason: any) => {
+        logger.warn('🔴 Deepgram connection closed', { code, reason });
       });
 
       connection.on(LiveTranscriptionEvents.Metadata, (data) => {
-        logger.debug('Deepgram metadata', { data });
+        logger.info('📊 Deepgram metadata', { data });
+      });
+
+      connection.on(LiveTranscriptionEvents.Error, (error) => {
+        logger.error('💀 Deepgram error outside Open', { error });
+        onError(`Deepgram error: ${error.message || 'Unknown error'}`);
       });
 
       return connection;

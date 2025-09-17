@@ -133,7 +133,8 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
-            sampleRate: 16000
+            sampleRate: 16000, // Match working example
+            channelCount: 1
           }
         });
         stream.getTracks().forEach(track => track.stop());
@@ -143,25 +144,38 @@ export default function AudioRecorder({ onTranscription, globalConnectionStatus 
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 16000
+          sampleRate: 16000, // Match working example and backend
+          channelCount: 1
         }
       });
 
       setupAudioAnalyser(stream);
 
+      // Check for supported MIME types
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : 'audio/wav';
+
       mediaRecorderRef.current = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType: mimeType
       });
 
       const audioChunks: Blob[] = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
+        console.log('🎵 MediaRecorder ondataavailable:', event.data.size, 'bytes');
         if (event.data.size > 0) {
           audioChunks.push(event.data);
-          // Send audio chunk to backend via WebSocket
+          // Convert to PCM format before sending
           event.data.arrayBuffer().then(buffer => {
+            console.log('🔄 Converting blob to ArrayBuffer:', buffer.byteLength, 'bytes');
+            // For now, send the raw buffer - we'll convert on the server side
             sendAudioChunk(buffer);
           });
+        } else {
+          console.warn('⚠️ MediaRecorder generated empty audio chunk');
         }
       };
 
